@@ -8,16 +8,16 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func RegisterRoutes(e *echo.Echo, db *sql.DB) {
+func RegisterRoutes(g *echo.Group, db *sql.DB) {
 	repo := NewRepository(db)
 	service := NewService(repo)
 
-	g := e.Group("/establishments")
-	g.GET("", getAll(service))
-	g.GET("/:id", getByID(service))
-	g.POST("", create(service))
-	g.PUT("/:id", update(service))
-	g.DELETE("/:id", delete(service))
+	// g := e.Group("/establishments")
+	g.GET("/establishments", getAll(service))
+	g.GET("/establishments/:id", getByID(service))
+	g.POST("/establishments", create(service))
+	g.PUT("/establishments/:id", update(service))
+	g.DELETE("/establishments/:id", delete(service))
 }
 
 func getAll(service Service) echo.HandlerFunc {

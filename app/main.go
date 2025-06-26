@@ -5,7 +5,7 @@ import (
 	"store-manager-api/app/database"
 	"store-manager-api/app/modules/establishment"
 	"store-manager-api/app/modules/store"
-
+	"store-manager-api/app/modules/auth"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/lib/pq"
@@ -22,13 +22,16 @@ func main() {
 		log.Fatalf("Erro ao conectar ao banco de dados: %v", err)
 	}
 
-	// Rotas
-	e.POST("/login", func(c echo.Context) error {
-		return c.JSON(200, echo.Map{"message": "Login simulado com sucesso"})
-	})
+	// Rota pública
+	e.POST("/login", auth.Login)
 
-	establishment.RegisterRoutes(e, db)
-	store.RegisterRoutes(e, db)
+	// Rotas protegidas
+	api := e.Group("/api")
+	api.Use(auth.JWTMiddleware())
+
+	// Roteamento dentro do grupo protegido
+	establishment.RegisterRoutes(api, db)
+	store.RegisterRoutes(api, db)
 
 	e.Logger.Fatal(e.Start(":8080"))
 
