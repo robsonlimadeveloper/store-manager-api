@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"net/http"
 	"strconv"
-
 	"github.com/labstack/echo/v4"
 )
 
@@ -12,7 +11,6 @@ func RegisterRoutes(g *echo.Group, db *sql.DB) {
 	repo := NewRepository(db)
 	service := NewService(repo)
 
-	// g := e.Group("/establishments")
 	g.GET("/establishments", getAll(service))
 	g.GET("/establishments/:id", getByID(service))
 	g.POST("/establishments", create(service))
@@ -47,7 +45,7 @@ func create(service Service) echo.HandlerFunc {
 		if err := c.Bind(&est); err != nil {
 			return c.JSON(http.StatusBadRequest, echo.Map{"message": "Dados inválidos"})
 		}
-		if err := service.Create(est); err != nil {
+		if err := service.Create(&est); err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{"message": "Erro ao criar estabelecimento"})
 		}
 		return c.JSON(http.StatusCreated, echo.Map{"message": "Estabelecimento criado com sucesso"})
@@ -62,7 +60,7 @@ func update(service Service) echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, echo.Map{"message": "Dados inválidos"})
 		}
 		est.ID = id
-		if err := service.Update(est); err != nil {
+		if err := service.Update(&est); err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{"message": "Erro ao atualizar estabelecimento"})
 		}
 		return c.JSON(http.StatusOK, echo.Map{"message": "Estabelecimento atualizado com sucesso"})

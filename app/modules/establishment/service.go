@@ -1,13 +1,12 @@
 package establishment
 
-import "errors"
+import (
+	"errors"
+	"store-manager-api/app/core"
+)
 
 type Service interface {
-	GetAll() ([]Establishment, error)
-	GetByID(id int) (*Establishment, error)
-	Create(e Establishment) error
-	Update(e Establishment) error
-	Delete(id int) error
+	core.Service[Establishment]
 }
 
 type service struct {
@@ -26,11 +25,11 @@ func (s *service) GetByID(id int) (*Establishment, error) {
 	return s.repo.FindByID(id)
 }
 
-func (s *service) Create(e Establishment) error {
+func (s *service) Create(e *Establishment) error {
 	return s.repo.Create(e)
 }
 
-func (s *service) Update(e Establishment) error {
+func (s *service) Update(e *Establishment) error {
 	return s.repo.Update(e)
 }
 

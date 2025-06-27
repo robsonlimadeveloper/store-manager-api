@@ -2,14 +2,11 @@ package store
 
 import (
 	"database/sql"
+	"store-manager-api/app/core"
 )
 
 type Repository interface {
-	FindAll() ([]Store, error)
-	FindByID(id int) (*Store, error)
-	Create(s Store) error
-	Update(s Store) error
-	Delete(id int) error
+	core.Repository[Store] 
 }
 
 type repository struct {
@@ -56,7 +53,7 @@ func (r *repository) FindByID(id int) (*Store, error) {
 	return &s, nil
 }
 
-func (r *repository) Create(s Store) error {
+func (r *repository) Create(s *Store) error {
 	_, err := r.db.Exec(`
 		INSERT INTO stores (number, name, corporate_name, address, city, state, zip_code, street_number, establishment_id)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
@@ -64,7 +61,7 @@ func (r *repository) Create(s Store) error {
 	return err
 }
 
-func (r *repository) Update(s Store) error {
+func (r *repository) Update(s *Store) error {
 	_, err := r.db.Exec(`
 		UPDATE stores SET
 			number = $1,

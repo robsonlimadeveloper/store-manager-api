@@ -4,8 +4,9 @@ import (
 	"database/sql"
 	"net/http"
 	"strconv"
-
+	"store-manager-api/app/core"
 	"github.com/labstack/echo/v4"
+	"store-manager-api/app/modules/store/dto"
 )
 
 func RegisterRoutes(g *echo.Group, db *sql.DB) {
@@ -47,14 +48,51 @@ func getByID(service Service) echo.HandlerFunc {
 
 func create(service Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var s Store
-		if err := c.Bind(&s); err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{"message": "Dados inválidos"})
+		var input dto.CreateStoreDTO
+
+		if err := c.Bind(&input); err != nil {
+			return c.JSON(http.StatusBadRequest, core.JsonResponse{
+				Message: "Erro ao ler dados",
+				Error:   err.Error(),
+			})
 		}
-		if err := service.Create(s); err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{"message": "Erro ao criar loja"})
+
+		store := Store{
+			Number:          input.Number,
+			Name:            input.Name,
+			CorporateName:   input.CorporateName,
+			Address:         input.Address,
+			City:            input.City,
+			State:           input.State,
+			ZipCode:         input.ZipCode,
+			StreetNumber:    input.StreetNumber,
+			EstablishmentID: input.EstablishmentID,
 		}
-		return c.JSON(http.StatusCreated, echo.Map{"message": "Loja criada com sucesso"})
+
+		if err := service.Create(&store); err != nil {
+			return c.JSON(http.StatusInternalServerError, core.JsonResponse{
+				Message: "Erro ao criar loja",
+				Error:   err.Error(),
+			})
+		}
+
+		response := dto.StoreResponseDTO{
+			ID:              store.ID,
+			Number:          store.Number,
+			Name:            store.Name,
+			CorporateName:   store.CorporateName,
+			Address:         store.Address,
+			City:            store.City,
+			State:           store.State,
+			ZipCode:         store.ZipCode,
+			StreetNumber:    store.StreetNumber,
+			EstablishmentID: store.EstablishmentID,
+		}
+
+		return c.JSON(http.StatusCreated, core.JsonResponse{
+			Message: "Loja criada com sucesso",
+			Data:    response,
+		})
 	}
 }
 
@@ -71,7 +109,7 @@ func update(service Service) echo.HandlerFunc {
 		}
 		s.ID = id
 
-		if err := service.Update(s); err != nil {
+		if err := service.Update(&s); err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{"message": "Erro ao atualizar loja"})
 		}
 		return c.JSON(http.StatusOK, echo.Map{"message": "Loja atualizada com sucesso"})

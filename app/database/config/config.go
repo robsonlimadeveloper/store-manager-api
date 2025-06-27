@@ -4,7 +4,6 @@ import (
 	"os"
 )
 
-
 func GetStringDatabaseURL() string {
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")

@@ -2,15 +2,12 @@ package establishment
 
 import (
 	"database/sql"
+	"store-manager-api/app/core"
 )
 
 type Repository interface {
-	FindAll() ([]Establishment, error)
-	FindByID(id int) (*Establishment, error)
-	Create(e Establishment) error
-	Update(e Establishment) error
-	Delete(id int) error
-	HasStores(id int) (bool, error)
+	core.Repository[Establishment]
+	HasStores(establishmentID int) (bool, error)
 }
 
 type repository struct {
@@ -49,7 +46,7 @@ func (r *repository) FindByID(id int) (*Establishment, error) {
 	return &e, nil
 }
 
-func (r *repository) Create(e Establishment) error {
+func (r *repository) Create(e *Establishment) error {
 	_, err := r.db.Exec(`
 		INSERT INTO establishments (number, name, corporate_name, address, city, state, zip_code, street_number)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
@@ -58,7 +55,7 @@ func (r *repository) Create(e Establishment) error {
 	return err
 }
 
-func (r *repository) Update(e Establishment) error {
+func (r *repository) Update(e *Establishment) error {
 	_, err := r.db.Exec(`
 		UPDATE establishments
 		SET number=$1, name=$2, corporate_name=$3, address=$4, city=$5, state=$6, zip_code=$7, street_number=$8
