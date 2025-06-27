@@ -1,5 +1,7 @@
 package establishment
 
+// Package establishment provides the service layer for managing establishments in the store manager API.
+
 import (
 	"errors"
 	"store-manager-api/app/core"
@@ -39,7 +41,7 @@ func (s *service) Delete(id int) error {
 		return err
 	}
 	if hasStores {
-		return errors.New("Não é possível remover: o estabelecimento possui lojas vinculadas")
+		return errors.New(ErrForeignKeyExists.Error())
 	}
 	return s.repo.Delete(id)
 }

@@ -1,5 +1,7 @@
 package store
 
+// Package store provides the service layer for managing stores in the store manager API.
+
 import (
 	"store-manager-api/app/core"
 )

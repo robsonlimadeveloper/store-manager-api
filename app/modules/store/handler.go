@@ -1,12 +1,14 @@
 package store
 
+// Package store provides handlers for managing stores in the store manager API.
+
 import (
 	"database/sql"
 	"net/http"
 	"strconv"
 	"store-manager-api/app/core"
 	"github.com/labstack/echo/v4"
-	"store-manager-api/app/modules/store/dto"
+	dto "store-manager-api/app/modules/store/dto"
 )
 
 func RegisterRoutes(g *echo.Group, db *sql.DB) {
@@ -20,39 +22,63 @@ func RegisterRoutes(g *echo.Group, db *sql.DB) {
 	g.DELETE("/stores/:id", delete(service))
 }
 
+// @Summary Lista todas as lojas
+// @Description Retorna a lista de todas as lojas cadastradas
+// @Tags stores
+// @Produce json
+// @Success 200 {object} core.JsonResponse
+// @Failure 500 {object} core.JsonResponse
+// @Router /api/stores [get]
 func getAll(service Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		stores, err := service.GetAll()
 
 		if err != nil {
 			c.Logger().Error("Erro ao listar lojas: ", err)
-			return c.JSON(http.StatusInternalServerError, echo.Map{"message": "Erro ao listar lojas"})
+			return c.JSON(http.StatusInternalServerError, echo.Map{"message": ErrListStoresFailed.Error()})
 		}
 		return c.JSON(http.StatusOK, echo.Map{"message": "Lista de lojas", "data": stores})
 	}
 }
 
+// @Summary Obtém loja por ID
+// @Tags stores
+// @Produce json
+// @Param id path int true "ID da loja"
+// @Success 200 {object} core.JsonResponse
+// @Failure 400 {object} core.JsonResponse
+// @Failure 404 {object} core.JsonResponse
+// @Router /api/stores/{id} [get]
 func getByID(service Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{"message": "ID inválido"})
+			return c.JSON(http.StatusBadRequest, echo.Map{"message": ErrInvalidInput.Error()})
 		}
 		store, err := service.GetByID(id)
 		if err != nil {
-			return c.JSON(http.StatusNotFound, echo.Map{"message": "Loja não encontrada"})
+			return c.JSON(http.StatusNotFound, echo.Map{"message": ErrNotFound.Error()})
 		}
-		return c.JSON(http.StatusOK, echo.Map{"message": "Loja encontrada", "data": store})
+		return c.JSON(http.StatusOK, echo.Map{"data": store})
 	}
 }
 
+// @Summary Cria uma nova loja
+// @Tags stores
+// @Accept json
+// @Produce json
+// @Param store body dto.CreateStoreDTO true "Dados da loja"
+// @Success 201 {object} core.JsonResponse
+// @Failure 400 {object} core.JsonResponse
+// @Failure 500 {object} core.JsonResponse
+// @Router /api/stores [post]
 func create(service Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var input dto.CreateStoreDTO
 
 		if err := c.Bind(&input); err != nil {
 			return c.JSON(http.StatusBadRequest, core.JsonResponse{
-				Message: "Erro ao ler dados",
+				Message: ErrInvalidInput.Error(),
 				Error:   err.Error(),
 			})
 		}
@@ -71,7 +97,7 @@ func create(service Service) echo.HandlerFunc {
 
 		if err := service.Create(&store); err != nil {
 			return c.JSON(http.StatusInternalServerError, core.JsonResponse{
-				Message: "Erro ao criar loja",
+				Message: ErrInternalServer.Error(),
 				Error:   err.Error(),
 			})
 		}
@@ -96,34 +122,52 @@ func create(service Service) echo.HandlerFunc {
 	}
 }
 
+// @Summary Atualiza loja existente
+// @Tags stores
+// @Accept json
+// @Produce json
+// @Param id path int true "ID da loja"
+// @Param store body dto.UpdateStoreDTO true "Dados para atualização"
+// @Success 200 {object} core.JsonResponse
+// @Failure 400 {object} core.JsonResponse
+// @Failure 500 {object} core.JsonResponse
+// @Router /api/stores/{id} [put]
 func update(service Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{"message": "ID inválido"})
+			return c.JSON(http.StatusBadRequest, echo.Map{"message": ErrInvalidID.Error()})
 		}
 
 		var s Store
 		if err := c.Bind(&s); err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{"message": "Dados inválidos"})
+			return c.JSON(http.StatusBadRequest, echo.Map{"message": ErrInvalidInput.Error()})
 		}
 		s.ID = id
 
 		if err := service.Update(&s); err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{"message": "Erro ao atualizar loja"})
+			return c.JSON(http.StatusInternalServerError, echo.Map{"message": ErrUpdateFailed.Error()})
 		}
 		return c.JSON(http.StatusOK, echo.Map{"message": "Loja atualizada com sucesso"})
 	}
 }
 
+// @Summary Remove uma loja
+// @Tags stores
+// @Produce json
+// @Param id path int true "ID da loja"
+// @Success 200 {object} core.JsonResponse
+// @Failure 400 {object} core.JsonResponse
+// @Failure 500 {object} core.JsonResponse
+// @Router /api/stores/{id} [delete]
 func delete(service Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{"message": "ID inválido"})
+			return c.JSON(http.StatusBadRequest, echo.Map{"message": ErrInvalidID.Error()})
 		}
 		if err := service.Delete(id); err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{"message": "Erro ao remover loja"})
+			return c.JSON(http.StatusInternalServerError, echo.Map{"message": ErrDeleteFailed.Error()})
 		}
 		return c.JSON(http.StatusOK, echo.Map{"message": "Loja removida com sucesso"})
 	}

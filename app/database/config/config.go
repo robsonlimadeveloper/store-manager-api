@@ -1,5 +1,8 @@
 package config
 
+// Package config provides functions to retrieve database connection details from environment variables.
+// It constructs a connection string for a PostgreSQL database using the provided environment variables.
+
 import (
 	"os"
 )

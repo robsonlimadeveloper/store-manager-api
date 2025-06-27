@@ -1,5 +1,7 @@
 package store
 
+// Store represents the data structure for a store.
+
 type Store struct {
 	ID               int    `json:"id"`
 	Number           string `json:"number"`

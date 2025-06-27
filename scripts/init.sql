@@ -1,5 +1,5 @@
 -- Criação da tabela de estabelecimentos
-CREATE TABLE establishments (
+CREATE TABLE IF NOT EXISTS establishments (
     id SERIAL PRIMARY KEY,
     number VARCHAR(50) NOT NULL,
     name VARCHAR(100) NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE establishments (
 );
 
 -- Criação da tabela de lojas
-CREATE TABLE stores (
+CREATE TABLE IF NOT EXISTS stores (
     id SERIAL PRIMARY KEY,
     number VARCHAR(50) NOT NULL,
     name VARCHAR(100) NOT NULL,

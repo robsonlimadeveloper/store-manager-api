@@ -1,5 +1,7 @@
 package database
 
+// Package database provides functions to initialize and manage the database connection.
+
 import (
 	"database/sql"
 	"log"

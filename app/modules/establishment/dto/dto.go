@@ -1,5 +1,8 @@
 package establishment
 
+// Package dto provides data transfer objects for the establishment module.
+// These DTOs are used to transfer data between the client and server, ensuring that the data structure is consistent and validated.
+
 type CreateEstablishmentDTO struct {
 	Number        string `json:"number" validate:"required"`
 	Name          string `json:"name" validate:"required"`

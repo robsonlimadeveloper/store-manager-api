@@ -1,5 +1,7 @@
 package establishment
 
+// Package establishment provides the repository interface and implementation for managing establishments in the store manager API.
+
 import (
 	"database/sql"
 	"store-manager-api/app/core"

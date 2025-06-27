@@ -1,5 +1,7 @@
 package store
 
+// Package store provides the repository interface and implementation for managing stores in the store manager API.
+
 import (
 	"database/sql"
 	"store-manager-api/app/core"
