@@ -14,7 +14,7 @@ import (
 
 var jwtSecret = []byte(os.Getenv("SECRET_KEY"))
 
-// Middleware para autenticação JWT
+// Middleware JWT Authentication
 func CustomJWTMiddleware() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -22,15 +22,15 @@ func CustomJWTMiddleware() echo.MiddlewareFunc {
 
 			if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
 				return c.JSON(http.StatusUnauthorized, echo.Map{
-					"message": "Token de autenticação ausente ou inválido",
+					"message": "Authorization header is missing or invalid",
 				})
 			}
 
 			tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
 
-			// Faz o parse e validação do token JWT
+			// Parse JWT token
 			token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-				// Confirma que o algoritmo é o esperado
+				// Confirm if the signing method is HMAC
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 					return nil, echo.NewHTTPError(http.StatusUnauthorized, "Algoritmo de assinatura inválido")
 				}
@@ -39,7 +39,7 @@ func CustomJWTMiddleware() echo.MiddlewareFunc {
 
 			if err != nil || !token.Valid {
 				return c.JSON(http.StatusUnauthorized, echo.Map{
-					"message": "Token inválido ou expirado",
+					"message": "Invalid token",
 				})
 			}
 
@@ -51,9 +51,9 @@ func CustomJWTMiddleware() echo.MiddlewareFunc {
 			// Chama o próximo handler
 			err = next(c)
 			if err != nil {
-				c.Logger().Error("Erro no handler:", err)
+				c.Logger().Error("Handler error:", err)
 				return c.JSON(http.StatusInternalServerError, echo.Map{
-					"message": "Erro interno do servidor",
+					"message": "Internal server error",
 				})
 			}
 

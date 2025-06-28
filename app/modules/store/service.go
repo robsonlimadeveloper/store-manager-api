@@ -6,15 +6,15 @@ import (
 	"store-manager-api/app/core"
 )
 
-type Service interface {
+type StoreService interface {
 	core.Service[Store]
 }
 
 type service struct {
-	repo Repository
+	repo StoreRepository
 }
 
-func NewService(r Repository) Service {
+func NewService(r StoreRepository) StoreService {
 	return &service{repo: r}
 }
 

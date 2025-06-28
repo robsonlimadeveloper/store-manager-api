@@ -6,9 +6,9 @@ package auth
 import "errors"
 
 var (
-	ErrInvalidCredentials = errors.New("credenciais inválidas")
-	ErrTokenExpired       = errors.New("erro ao gerar o token")
-	ErrUnauthorized       = errors.New("não autorizado")
-	ErrInternalServer     = errors.New("erro interno do servidor")
-	ErrInvalidInput       = errors.New("dados inválidos")
+	ErrInvalidCredentials = errors.New("Invalid credentials")
+	ErrTokenExpired       = errors.New("Token expired")
+	ErrUnauthorized       = errors.New("Not authorized")
+	ErrInternalServer     = errors.New("Internal server error")
+	ErrInvalidInput       = errors.New("Invalid input data")
 )

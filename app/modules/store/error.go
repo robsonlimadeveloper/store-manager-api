@@ -5,13 +5,13 @@ package store
 import "errors"
 
 var (
-	ErrNotFound         = errors.New("loja não encontrada")
-	ErrInvalidInput     = errors.New("dados inválidos")
-	ErrCreateFailed   = errors.New("falha ao criar loja")
-	ErrUpdateFailed   = errors.New("falha ao atualizar loja")
-	ErrDeleteFailed   = errors.New("falha ao deletar loja")
-	ErrInvalidID       = errors.New("ID inválido")
-	ErrForeignKeyExists = errors.New("não é possível remover: a loja possui estabelecimentos vinculados")
-	ErrListStoresFailed = errors.New("falha ao listar lojas")
-	ErrInternalServer   = errors.New("erro interno do servidor")
+	ErrNotFound         = errors.New("Store not found")
+	ErrInvalidInput     = errors.New("Invalid input data")
+	ErrCreateFailed   = errors.New("Failed to create store")
+	ErrUpdateFailed   = errors.New("Failed to update store")
+	ErrDeleteFailed   = errors.New("Failed to delete store")
+	ErrInvalidID       = errors.New("Invalid ID")
+	ErrForeignKeyExists = errors.New("Cannot delete store with existing foreign key references")
+	ErrListStoresFailed = errors.New("Failed to list stores")
+	ErrInternalServer   = errors.New("Internal server error")
 )

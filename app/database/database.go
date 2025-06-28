@@ -20,7 +20,7 @@ func Init() (*sql.DB, error) {
 		log.Fatal(err)
 	}
 	if err = db.Ping(); err != nil {
-		log.Fatal("Erro ao conectar ao banco de dados:", err)
+		log.Fatal("Error to connect to database:", err)
 	}
 	return db, err
 }

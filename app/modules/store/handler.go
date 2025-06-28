@@ -5,10 +5,11 @@ package store
 import (
 	"database/sql"
 	"net/http"
-	"strconv"
 	"store-manager-api/app/core"
-	"github.com/labstack/echo/v4"
 	dto "store-manager-api/app/modules/store/dto"
+	"strconv"
+
+	"github.com/labstack/echo/v4"
 )
 
 func RegisterRoutes(g *echo.Group, db *sql.DB) {
@@ -22,34 +23,37 @@ func RegisterRoutes(g *echo.Group, db *sql.DB) {
 	g.DELETE("/stores/:id", delete(service))
 }
 
-// @Summary Lista todas as lojas
-// @Description Retorna a lista de todas as lojas cadastradas
-// @Tags stores
+// @Summary List all stores
+// @Description Returns a list of all stores registered in the system.
+// @Tags Stores
 // @Produce json
+// @Security BearerAuth
 // @Success 200 {object} core.JsonResponse
 // @Failure 500 {object} core.JsonResponse
-// @Router /api/stores [get]
-func getAll(service Service) echo.HandlerFunc {
+// @Router /v1/api/stores [get]
+func getAll(service StoreService) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		stores, err := service.GetAll()
 
 		if err != nil {
-			c.Logger().Error("Erro ao listar lojas: ", err)
+			c.Logger().Error("Error: ", err)
 			return c.JSON(http.StatusInternalServerError, echo.Map{"message": ErrListStoresFailed.Error()})
 		}
-		return c.JSON(http.StatusOK, echo.Map{"message": "Lista de lojas", "data": stores})
+		return c.JSON(http.StatusOK, echo.Map{"data": stores})
 	}
 }
 
-// @Summary Obtém loja por ID
-// @Tags stores
+// @Summary Get store by ID
+// @Description Returns the store with the specified ID.
+// @Tags Stores
 // @Produce json
-// @Param id path int true "ID da loja"
+// @Security BearerAuth
+// @Param id path int true "Store ID"
 // @Success 200 {object} core.JsonResponse
 // @Failure 400 {object} core.JsonResponse
 // @Failure 404 {object} core.JsonResponse
-// @Router /api/stores/{id} [get]
-func getByID(service Service) echo.HandlerFunc {
+// @Router /v1/api/stores/{id} [get]
+func getByID(service StoreService) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
@@ -63,16 +67,18 @@ func getByID(service Service) echo.HandlerFunc {
 	}
 }
 
-// @Summary Cria uma nova loja
-// @Tags stores
+// @Summary Create a new store
+// @Description Creates a new store with the provided data.
+// @Tags Stores
 // @Accept json
 // @Produce json
-// @Param store body dto.CreateStoreDTO true "Dados da loja"
+// @Security BearerAuth
+// @Param store body dto.CreateStoreDTO true "Store data"
 // @Success 201 {object} core.JsonResponse
 // @Failure 400 {object} core.JsonResponse
 // @Failure 500 {object} core.JsonResponse
-// @Router /api/stores [post]
-func create(service Service) echo.HandlerFunc {
+// @Router /v1/api/stores [post]
+func create(service StoreService) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var input dto.CreateStoreDTO
 
@@ -115,24 +121,25 @@ func create(service Service) echo.HandlerFunc {
 			EstablishmentID: store.EstablishmentID,
 		}
 
-		return c.JSON(http.StatusCreated, core.JsonResponse{
-			Message: "Loja criada com sucesso",
-			Data:    response,
+		return c.JSON(http.StatusCreated, echo.Map{
+			"data":    response,
 		})
 	}
 }
 
-// @Summary Atualiza loja existente
-// @Tags stores
+// @Summary Update an existing store
+// @Description Updates the store with the specified ID using the provided data.
+// @Tags Stores
 // @Accept json
 // @Produce json
-// @Param id path int true "ID da loja"
-// @Param store body dto.UpdateStoreDTO true "Dados para atualização"
+// @Security BearerAuth
+// @Param id path int true "Store ID"
+// @Param store body dto.UpdateStoreDTO true "Update data for the store"
 // @Success 200 {object} core.JsonResponse
 // @Failure 400 {object} core.JsonResponse
 // @Failure 500 {object} core.JsonResponse
-// @Router /api/stores/{id} [put]
-func update(service Service) echo.HandlerFunc {
+// @Router /v1/api/stores/{id} [put]
+func update(service StoreService) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
@@ -148,19 +155,32 @@ func update(service Service) echo.HandlerFunc {
 		if err := service.Update(&s); err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{"message": ErrUpdateFailed.Error()})
 		}
-		return c.JSON(http.StatusOK, echo.Map{"message": "Loja atualizada com sucesso"})
+		return c.JSON(http.StatusOK, echo.Map{"data": dto.StoreResponseDTO{
+			ID:              s.ID,
+			Number:          s.Number,
+			Name:            s.Name,
+			CorporateName:   s.CorporateName,
+			Address:         s.Address,
+			City:            s.City,
+			State:           s.State,
+			ZipCode:         s.ZipCode,
+			StreetNumber:    s.StreetNumber,
+			EstablishmentID: s.EstablishmentID,
+		}})
 	}
 }
 
-// @Summary Remove uma loja
-// @Tags stores
+// @Summary Remove a store
+// @Description Removes the store with the specified ID.
+// @Tags Stores
 // @Produce json
-// @Param id path int true "ID da loja"
+// @Security BearerAuth
+// @Param id path int true "Store ID"
 // @Success 200 {object} core.JsonResponse
 // @Failure 400 {object} core.JsonResponse
 // @Failure 500 {object} core.JsonResponse
-// @Router /api/stores/{id} [delete]
-func delete(service Service) echo.HandlerFunc {
+// @Router /v1/api/stores/{id} [delete]
+func delete(service StoreService) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
@@ -169,6 +189,8 @@ func delete(service Service) echo.HandlerFunc {
 		if err := service.Delete(id); err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{"message": ErrDeleteFailed.Error()})
 		}
-		return c.JSON(http.StatusOK, echo.Map{"message": "Loja removida com sucesso"})
+		return c.JSON(http.StatusOK, echo.Map{"data": dto.StoreResponseDTO{
+			ID: id,
+		}})
 	}
 }

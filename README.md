@@ -41,3 +41,26 @@ or
 ```sh
 $ docker-compose up --build -d
 ```
+## Swagger Documentation
+
+[http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html#/)
+
+
+### Authenticate and using Swagger Page
+
+1 - http://localhost:8080/v1/api/login
+
+2 - Copy the token returned and use in Authorized Button option:
+
+3 - Paste token with Bearer prefix. Example: _Bearer ue54da221dd..._ 
+
+
+## Run tests
+
+```sh
+$ docker exec -it store-manager-api sh
+```
+
+```sh
+@container go test ./...
+```

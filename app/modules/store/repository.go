@@ -7,7 +7,9 @@ import (
 	"store-manager-api/app/core"
 )
 
-type Repository interface {
+
+
+type StoreRepository interface {
 	core.Repository[Store] 
 }
 
@@ -15,7 +17,7 @@ type repository struct {
 	db *sql.DB
 }
 
-func NewRepository(db *sql.DB) Repository {
+func NewRepository(db *sql.DB) StoreRepository {
 	return &repository{db: db}
 }
 

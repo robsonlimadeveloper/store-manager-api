@@ -1,3 +1,20 @@
+// @title Store Manager API
+// @version 1.0
+// @description API REST to manage stores and establishments.
+
+// @contact.name Robson Soares
+// @contact.url https://github.com/robsonlimadeveloper/
+// @contact.email robsonlimadeveloper@gmail.com
+
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+
+// @host localhost:8080
+// @BasePath /
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 package main
 
 // main.go
@@ -6,16 +23,12 @@ package main
 // and registers routes for authentication, establishments, and stores.
 
 import (
-	"store-manager-api/app/database"
-	"store-manager-api/app/modules/establishment"
-	"store-manager-api/app/modules/store"
-	"store-manager-api/app/modules/auth"
-	"store-manager-api/app/middleware"
+	routes "store-manager-api/app/core/routes"
 	"github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
 	_ "store-manager-api/app/docs"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
-	echoSwagger "github.com/swaggo/echo-swagger"
+	"store-manager-api/app/database"
 )
 
 func main() {
@@ -23,29 +36,16 @@ func main() {
 	e.Use(echoMiddleware.Logger())
 	e.Use(echoMiddleware.Recover())
 	
-	// Inicializa o banco de dados
+	// Start database connection
 	db, err := database.Init()
 	if err != nil {
-		e.Logger.Fatal("Erro ao conectar ao banco de dados:", err)
+		e.Logger.Fatal("Error to connect to database", err)
 	}
 
-	// Rota pública
-	e.POST("/login", auth.Login)
-	e.GET("/swagger/*", echoSwagger.WrapHandler)
+	routes.RegisterRoutes(e, db)
 
-	// Rota de verificação de saúde
-	e.GET("/health", func(c echo.Context) error {
-		return c.JSON(200, echo.Map{"status": "OK"})
-	})
+	e.Logger.Info("Store Manager API is running on port 8080")
 	
-	// Rotas protegidas
-	api := e.Group("/api")
-	api.Use(middleware.CustomJWTMiddleware())
-
-	// Roteamento dentro do grupo protegido
-	establishment.RegisterRoutes(api, db)
-	store.RegisterRoutes(api, db)
-
 	e.Logger.Fatal(e.Start(":8080"))
 
 }

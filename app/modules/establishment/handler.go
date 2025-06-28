@@ -24,12 +24,14 @@ func RegisterRoutes(g *echo.Group, db *sql.DB) {
 	g.DELETE("/establishments/:id", delete(service))
 }
 
-// @Summary Lista todos os estabelecimentos
-// @Tags establishments
+// @Summary List all establishments
+// @Description Returns a list of all establishments registered in the system.
+// @Tags Establishments
 // @Produce json
+// @Security BearerAuth
 // @Success 200 {object} core.JsonResponse
 // @Failure 500 {object} core.JsonResponse
-// @Router /api/establishments [get]
+// @Router /v1/api/establishments [get]
 func getAll(service Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		data, err := service.GetAll()
@@ -40,14 +42,16 @@ func getAll(service Service) echo.HandlerFunc {
 	}
 }
 
-// @Summary Obtém estabelecimento por ID
-// @Tags establishments
+// @Summary Get establishment by ID
+// @Description Returns the establishment with the specified ID.
+// @Tags Establishments
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "ID do estabelecimento"
 // @Success 200 {object} core.JsonResponse
 // @Failure 400 {object} core.JsonResponse
 // @Failure 404 {object} core.JsonResponse
-// @Router /api/establishments/{id} [get]
+// @Router /v1/api/establishments/{id} [get]
 func getByID(service Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, _ := strconv.Atoi(c.Param("id"))
@@ -59,15 +63,17 @@ func getByID(service Service) echo.HandlerFunc {
 	}
 }
 
-// @Summary Cria um novo estabelecimento
-// @Tags establishments
+// @Summary Create a new establishment
+// @Description Creates a new establishment with the provided data.
+// @Tags Establishments
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param establishment body dto.CreateEstablishmentDTO true "Dados do estabelecimento"
 // @Success 201 {object} core.JsonResponse
 // @Failure 400 {object} core.JsonResponse
 // @Failure 500 {object} core.JsonResponse
-// @Router /api/establishments [post]
+// @Router /v1/api/establishments [post]
 func create(service Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var est Establishment
@@ -81,16 +87,18 @@ func create(service Service) echo.HandlerFunc {
 	}
 }
 
-// @Summary Atualiza estabelecimento existente
-// @Tags establishments
+// @Summary Update an existing establishment
+// @Description Updates the establishment with the specified ID using the provided data.
+// @Tags Establishments
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "ID do estabelecimento"
 // @Param establishment body dto.UpdateEstablishmentDTO true "Dados para atualização"
 // @Success 200 {object} core.JsonResponse
 // @Failure 400 {object} core.JsonResponse
 // @Failure 500 {object} core.JsonResponse
-// @Router /api/establishments/{id} [put]
+// @Router /v1/api/establishments/{id} [put]
 func update(service Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, _ := strconv.Atoi(c.Param("id"))
@@ -106,14 +114,16 @@ func update(service Service) echo.HandlerFunc {
 	}
 }
 
-// @Summary Remove um estabelecimento
-// @Tags establishments
+// @Summary Remove an establishment
+// @Description Removes the establishment with the specified ID.
+// @Tags Establishments
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "ID do estabelecimento"
 // @Success 200 {object} core.JsonResponse
 // @Failure 400 {object} core.JsonResponse
 // @Failure 500 {object} core.JsonResponse
-// @Router /api/establishments/{id} [delete]
+// @Router /v1/api/establishments/{id} [delete]
 func delete(service Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, _ := strconv.Atoi(c.Param("id"))

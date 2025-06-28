@@ -7,7 +7,7 @@ import (
 	"store-manager-api/app/core"
 )
 
-type Repository interface {
+type EstablishmentRepository interface {
 	core.Repository[Establishment]
 	HasStores(establishmentID int) (bool, error)
 }
@@ -16,7 +16,7 @@ type repository struct {
 	db *sql.DB
 }
 
-func NewRepository(db *sql.DB) Repository {
+func NewRepository(db *sql.DB) EstablishmentRepository {
 	return &repository{db: db}
 }
 

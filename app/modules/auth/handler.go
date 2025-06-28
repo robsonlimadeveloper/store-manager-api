@@ -14,18 +14,47 @@ import (
 
 var jwtSecret = []byte(os.Getenv("SECRET_KEY"))
 
+// LoginRequest represents the structure of the login request.
+//
+// @Description Structure containing the username and password for user authentication.
 type LoginRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `json:"username" example:"admin"`
+	Password string `json:"password" example:"123"`
 }
 
+// LoginResponse represents the structure of the login response.
+//
+// @Description Structure containing the JWT token returned upon successful login.
+// @Description The token is used for subsequent authenticated requests.
+type LoginResponse struct {
+	Token string `json:"token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."`
+}
+
+// ErrorResponse represents the structure of an error response.
+//
+// @Description Structure containing an error message.
+type ErrorResponse struct {
+	Message string `json:"message" example:"Invalid credentials"`
+}
+
+// @Summary User Authentication
+// @Description Handles user login and returns a JWT token.
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param login body LoginRequest true "Login request with username and password"
+// @Success 200 {object} LoginResponse "Token generated successfully"
+// @Failure 400 {object} ErrorResponse "Invalid input data"
+// @Failure 401 {object} ErrorResponse "Invalid credentials"
+// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Router /v1/api/login [post]
 func Login(c echo.Context) error {
 	var req LoginRequest
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"message": ErrInvalidInput.Error()})
 	}
 
-	// Simula autenticação
+	// Authenticate simulation
 	if req.Username != "admin" || req.Password != "123" {
 		return c.JSON(http.StatusUnauthorized, echo.Map{"message": ErrInvalidCredentials.Error()})
 	}

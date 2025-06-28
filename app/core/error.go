@@ -6,8 +6,8 @@ package core
 import "errors"
 
 var (
-	ErrInternalServer = errors.New("erro interno do servidor")
-	ErrUnauthorized   = errors.New("não autorizado")
-	ErrTokenExpired   = errors.New("token expirado")
-	ErrInvalidToken   = errors.New("token inválido")
+	ErrInternalServer = errors.New("Internal server error")
+	ErrUnauthorized   = errors.New("Unauthorized access")
+	ErrTokenExpired   = errors.New("Token expired")
+	ErrInvalidToken   = errors.New("Invalid token")
 )

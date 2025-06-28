@@ -6,12 +6,12 @@ package establishment
 import "errors"
 
 var (
-	ErrNotFound		 = errors.New("estabelecimento não encontrado")
-	ErrInvalidInput  = errors.New("dados inválidos")
-	ErrForeignKeyExists = errors.New("não é possível remover: o estabelecimento possui lojas vinculadas")
-	ErrCreateFailed  = errors.New("falha ao criar estabelecimento")
-	ErrUpdateFailed  = errors.New("falha ao atualizar estabelecimento")
-	ErrDeleteFailed  = errors.New("falha ao deletar estabelecimento")
-	ErrInvalidID     = errors.New("ID inválido")
-	ErrListEstablishmentsFailed = errors.New("falha ao listar estabelecimentos")
+	ErrNotFound		 = errors.New("establishment not found")
+	ErrInvalidInput  = errors.New("invalid input data")
+	ErrForeignKeyExists = errors.New("cannot delete establishment with existing foreign key references")
+	ErrCreateFailed  = errors.New("failed to create establishment")
+	ErrUpdateFailed  = errors.New("failed to update establishment")
+	ErrDeleteFailed  = errors.New("failed to delete establishment")
+	ErrInvalidID     = errors.New("invalid ID")
+	ErrListEstablishmentsFailed = errors.New("failed to list establishments")
 )
