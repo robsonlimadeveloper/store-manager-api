@@ -1,0 +1,335 @@
+definitions:
+  core.JsonResponse:
+    properties:
+      data: {}
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+  dto.CreateStoreDTO:
+    properties:
+      address:
+        type: string
+      city:
+        type: string
+      corporate_name:
+        type: string
+      establishment_id:
+        type: integer
+      name:
+        type: string
+      number:
+        type: string
+      state:
+        type: string
+      street_number:
+        type: string
+      zip_code:
+        type: string
+    required:
+    - establishment_id
+    - name
+    - number
+    type: object
+  dto.UpdateStoreDTO:
+    properties:
+      address:
+        type: string
+      name:
+        type: string
+      street_number:
+        type: string
+    type: object
+  establishment.CreateEstablishmentDTO:
+    properties:
+      address:
+        type: string
+      city:
+        type: string
+      corporate_name:
+        type: string
+      name:
+        type: string
+      number:
+        type: string
+      state:
+        type: string
+      street_number:
+        type: string
+      zip_code:
+        type: string
+    required:
+    - name
+    - number
+    type: object
+  establishment.UpdateEstablishmentDTO:
+    properties:
+      address:
+        type: string
+      name:
+        type: string
+      street_number:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/establishments:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+      summary: Lista todos os estabelecimentos
+      tags:
+      - establishments
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados do estabelecimento
+        in: body
+        name: establishment
+        required: true
+        schema:
+          $ref: '#/definitions/establishment.CreateEstablishmentDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+      summary: Cria um novo estabelecimento
+      tags:
+      - establishments
+  /api/establishments/{id}:
+    delete:
+      parameters:
+      - description: ID do estabelecimento
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+      summary: Remove um estabelecimento
+      tags:
+      - establishments
+    get:
+      parameters:
+      - description: ID do estabelecimento
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+      summary: Obtém estabelecimento por ID
+      tags:
+      - establishments
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID do estabelecimento
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados para atualização
+        in: body
+        name: establishment
+        required: true
+        schema:
+          $ref: '#/definitions/establishment.UpdateEstablishmentDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+      summary: Atualiza estabelecimento existente
+      tags:
+      - establishments
+  /api/stores:
+    get:
+      description: Retorna a lista de todas as lojas cadastradas
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+      summary: Lista todas as lojas
+      tags:
+      - stores
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados da loja
+        in: body
+        name: store
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateStoreDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+      summary: Cria uma nova loja
+      tags:
+      - stores
+  /api/stores/{id}:
+    delete:
+      parameters:
+      - description: ID da loja
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+      summary: Remove uma loja
+      tags:
+      - stores
+    get:
+      parameters:
+      - description: ID da loja
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+      summary: Obtém loja por ID
+      tags:
+      - stores
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID da loja
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados para atualização
+        in: body
+        name: store
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateStoreDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/core.JsonResponse'
+      summary: Atualiza loja existente
+      tags:
+      - stores
+swagger: "2.0"
