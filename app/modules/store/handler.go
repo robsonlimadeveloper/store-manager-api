@@ -227,7 +227,16 @@ func delete(service StoreService) echo.HandlerFunc {
 	}
 }
 
-// GetByEstablishmentID returns all stores linked to a specific establishment
+// @Summary Get stores by establishment ID
+// @Description Returns a list of stores associated with the specified establishment ID.
+// @Tags Stores
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Establishment ID"
+// @Success 200 {object} core.JsonResponse
+// @Failure 400 {object} core.JsonResponse
+// @Failure 500 {object} core.JsonResponse
+// @Router /v1/api/stores/establishment/{id} [get]
 func getByEstablishmentID(service StoreService) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, err := utils.ParseIDParam(c, "id")
