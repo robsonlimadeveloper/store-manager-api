@@ -10,7 +10,8 @@ import (
 
 
 type StoreRepository interface {
-	core.Repository[Store] 
+	core.Repository[Store]
+	FindByEstablishmentID(establishmentID int) ([]Store, error)
 }
 
 type repository struct {
@@ -85,4 +86,29 @@ func (r *repository) Update(s *Store) error {
 func (r *repository) Delete(id int) error {
 	_, err := r.db.Exec(`DELETE FROM stores WHERE id = $1`, id)
 	return err
+}
+
+func (r *repository) FindByEstablishmentID(establishmentID int) ([]Store, error) {
+	rows, err := r.db.Query(`
+		SELECT id, number, name, corporate_name, address, city, state, zip_code, street_number, establishment_id
+		FROM stores WHERE establishment_id = $1`, establishmentID)
+	if err != nil {
+		return []Store{}, err
+	}
+	defer rows.Close()
+
+	stores := make([]Store, 0)
+	for rows.Next() {
+		var s Store
+		if err := rows.Scan(
+			&s.ID, &s.Number, &s.Name, &s.CorporateName,
+			&s.Address, &s.City, &s.State, &s.ZipCode,
+			&s.StreetNumber, &s.EstablishmentID,
+		); err != nil {
+			return []Store{}, err
+		}
+		stores = append(stores, s)
+	}
+
+	return stores, nil
 }

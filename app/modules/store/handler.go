@@ -6,11 +6,26 @@ import (
 	"database/sql"
 	"net/http"
 	"store-manager-api/app/core"
+	"store-manager-api/app/utils"
 	dto "store-manager-api/app/modules/store/dto"
-	"strconv"
-
+	validator "github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
+	"fmt"
 )
+
+var validate = validator.New()
+
+type StoreRequest struct {
+	Number         string `json:"number" validate:"required"`
+	Name           string `json:"name" validate:"required,min=2,max=100"`
+	CorporateName  string `json:"corporate_name" validate:"required"`
+	Address        string `json:"address" validate:"required"`
+	City           string `json:"city" validate:"required"`
+	State          string `json:"state" validate:"required,len=2"` // Sigla de 2 letras
+	ZipCode        string `json:"zip_code" validate:"required,len=8"` // Ex: 12345678
+	StreetNumber   string `json:"street_number" validate:"required"`
+	EstablishmentID int    `json:"establishment_id" validate:"required,gt=0"`
+}
 
 func RegisterRoutes(g *echo.Group, db *sql.DB) {
 	repo := NewRepository(db)
@@ -21,6 +36,7 @@ func RegisterRoutes(g *echo.Group, db *sql.DB) {
 	g.POST("/stores", create(service))
 	g.PUT("/stores/:id", update(service))
 	g.DELETE("/stores/:id", delete(service))
+	g.GET("/establishments/:id/stores", getByEstablishmentID(service))
 }
 
 // @Summary List all stores
@@ -55,13 +71,14 @@ func getAll(service StoreService) echo.HandlerFunc {
 // @Router /v1/api/stores/{id} [get]
 func getByID(service StoreService) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		id, err := strconv.Atoi(c.Param("id"))
+		id, err := utils.ParseIDParam(c, "id")
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{"message": ErrInvalidInput.Error()})
+			return c.JSON(http.StatusBadRequest, echo.Map{"message": ErrInvalidID.Error()})
 		}
+		
 		store, err := service.GetByID(id)
 		if err != nil {
-			return c.JSON(http.StatusNotFound, echo.Map{"message": ErrNotFound.Error()})
+			return c.JSON(http.StatusNotFound, echo.Map{"message": err.Error()})
 		}
 		return c.JSON(http.StatusOK, echo.Map{"data": store})
 	}
@@ -82,6 +99,7 @@ func create(service StoreService) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var input dto.CreateStoreDTO
 
+		// Bind JSON para struct
 		if err := c.Bind(&input); err != nil {
 			return c.JSON(http.StatusBadRequest, core.JsonResponse{
 				Message: ErrInvalidInput.Error(),
@@ -89,6 +107,20 @@ func create(service StoreService) echo.HandlerFunc {
 			})
 		}
 
+		// Validação dos campos usando go-playground/validator
+		if err := validate.Struct(input); err != nil {
+			validationErrors := err.(validator.ValidationErrors)
+			errors := make([]string, 0)
+			for _, e := range validationErrors {
+				errors = append(errors, fmt.Sprintf("Field '%s' failed on the '%s' validation", e.Field(), e.Tag()))
+			}
+			return c.JSON(http.StatusBadRequest, echo.Map{
+				"message": "Validation failed",
+				"errors":  errors,
+			})
+		}
+
+		// Criação do store no banco
 		store := Store{
 			Number:          input.Number,
 			Name:            input.Name,
@@ -122,7 +154,7 @@ func create(service StoreService) echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusCreated, echo.Map{
-			"data":    response,
+			"data": response,
 		})
 	}
 }
@@ -141,7 +173,7 @@ func create(service StoreService) echo.HandlerFunc {
 // @Router /v1/api/stores/{id} [put]
 func update(service StoreService) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		id, err := strconv.Atoi(c.Param("id"))
+		id, err := utils.ParseIDParam(c, "id")
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, echo.Map{"message": ErrInvalidID.Error()})
 		}
@@ -182,7 +214,7 @@ func update(service StoreService) echo.HandlerFunc {
 // @Router /v1/api/stores/{id} [delete]
 func delete(service StoreService) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		id, err := strconv.Atoi(c.Param("id"))
+		id, err := utils.ParseIDParam(c, "id")
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, echo.Map{"message": ErrInvalidID.Error()})
 		}
@@ -192,5 +224,22 @@ func delete(service StoreService) echo.HandlerFunc {
 		return c.JSON(http.StatusOK, echo.Map{"data": dto.StoreResponseDTO{
 			ID: id,
 		}})
+	}
+}
+
+// GetByEstablishmentID returns all stores linked to a specific establishment
+func getByEstablishmentID(service StoreService) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id, err := utils.ParseIDParam(c, "id")
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, echo.Map{"message": ErrInvalidID.Error()})
+		}
+
+		stores, err := service.GetByEstablishmentID(id)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{"message": "Could not fetch stores"})
+		}
+
+		return c.JSON(http.StatusOK, echo.Map{"data": stores})
 	}
 }

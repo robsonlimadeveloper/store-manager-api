@@ -50,6 +50,13 @@ type ErrorResponse struct {
 // @Router /v1/api/login [post]
 func Login(c echo.Context) error {
 	var req LoginRequest
+
+	//logging the request
+	c.Logger().Info("Received login request")
+
+	// logging the request body
+	c.Logger().Info("Request body: ", req)
+
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"message": ErrInvalidInput.Error()})
 	}

@@ -62,5 +62,5 @@ $ docker exec -it store-manager-api sh
 ```
 
 ```sh
-@container go test ./...
+@container go test ./... -v -cover
 ```
