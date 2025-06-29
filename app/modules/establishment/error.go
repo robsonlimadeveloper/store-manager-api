@@ -8,7 +8,7 @@ import "errors"
 var (
 	ErrNotFound		 = errors.New("establishment not found")
 	ErrInvalidInput  = errors.New("invalid input data")
-	ErrForeignKeyExists = errors.New("cannot delete establishment with existing foreign key references")
+	ErrForeignKeyExists = errors.New("cannot delete establishment with associated stores")
 	ErrCreateFailed  = errors.New("failed to create establishment")
 	ErrUpdateFailed  = errors.New("failed to update establishment")
 	ErrDeleteFailed  = errors.New("failed to delete establishment")

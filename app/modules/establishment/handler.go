@@ -6,9 +6,9 @@ package establishment
 import (
 	"database/sql"
 	"net/http"
-	"strconv"
 	"github.com/labstack/echo/v4"
 	dto "store-manager-api/app/modules/establishment/dto"
+	"store-manager-api/app/utils"
 )
 
 var _ = dto.CreateEstablishmentDTO{}
@@ -47,17 +47,20 @@ func getAll(service Service) echo.HandlerFunc {
 // @Tags Establishments
 // @Produce json
 // @Security BearerAuth
-// @Param id path int true "ID do estabelecimento"
+// @Param id path int true "Establishment ID"
 // @Success 200 {object} core.JsonResponse
 // @Failure 400 {object} core.JsonResponse
 // @Failure 404 {object} core.JsonResponse
 // @Router /v1/api/establishments/{id} [get]
 func getByID(service Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		id, _ := strconv.Atoi(c.Param("id"))
+		id, err := utils.ParseIDParam(c, "id")
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, echo.Map{"message": ErrInvalidID.Error()})
+		}
 		est, err := service.GetByID(id)
 		if err != nil {
-			return c.JSON(http.StatusNotFound, echo.Map{"message": ErrNotFound.Error()})
+			return c.JSON(http.StatusNotFound, echo.Map{"message": err.Error()})
 		}
 		return c.JSON(http.StatusOK, echo.Map{"data": est})
 	}
@@ -69,7 +72,7 @@ func getByID(service Service) echo.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param establishment body dto.CreateEstablishmentDTO true "Dados do estabelecimento"
+// @Param establishment body dto.CreateEstablishmentDTO true "Establishment data"
 // @Success 201 {object} core.JsonResponse
 // @Failure 400 {object} core.JsonResponse
 // @Failure 500 {object} core.JsonResponse
@@ -83,7 +86,7 @@ func create(service Service) echo.HandlerFunc {
 		if err := service.Create(&est); err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{"message": ErrCreateFailed.Error()})
 		}
-		return c.JSON(http.StatusCreated, echo.Map{"message": "Estabelecimento criado com sucesso"})
+		return c.JSON(http.StatusCreated, echo.Map{"message": "Establishment created successfully"})
 	}
 }
 
@@ -94,14 +97,19 @@ func create(service Service) echo.HandlerFunc {
 // @Produce json
 // @Security BearerAuth
 // @Param id path int true "ID do estabelecimento"
-// @Param establishment body dto.UpdateEstablishmentDTO true "Dados para atualização"
+// @Param establishment body dto.UpdateEstablishmentDTO true "Establishment data"
 // @Success 200 {object} core.JsonResponse
 // @Failure 400 {object} core.JsonResponse
 // @Failure 500 {object} core.JsonResponse
 // @Router /v1/api/establishments/{id} [put]
 func update(service Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		id, _ := strconv.Atoi(c.Param("id"))
+		id, err := utils.ParseIDParam(c, "id")
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, echo.Map{"message": ErrInvalidID.Error()})
+		}
+		
+		// Bind the request body to the Establishment struct
 		var est Establishment
 		if err := c.Bind(&est); err != nil {
 			return c.JSON(http.StatusBadRequest, echo.Map{"message": ErrInvalidInput.Error()})
@@ -110,7 +118,7 @@ func update(service Service) echo.HandlerFunc {
 		if err := service.Update(&est); err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{"message": ErrUpdateFailed.Error()})
 		}
-		return c.JSON(http.StatusOK, echo.Map{"message": "Estabelecimento atualizado com sucesso"})
+		return c.JSON(http.StatusOK, echo.Map{"message": "Establishment updated successfully"})
 	}
 }
 
@@ -126,10 +134,13 @@ func update(service Service) echo.HandlerFunc {
 // @Router /v1/api/establishments/{id} [delete]
 func delete(service Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		id, _ := strconv.Atoi(c.Param("id"))
-		if err := service.Delete(id); err != nil {
-			return c.JSON(http.StatusBadRequest, echo.Map{"message": ErrDeleteFailed.Error()})
+		id, err := utils.ParseIDParam(c, "id")
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, echo.Map{"message": ErrInvalidID.Error()})
 		}
-		return c.JSON(http.StatusOK, echo.Map{"message": "Estabelecimento removido com sucesso"})
+		if err := service.Delete(id); err != nil {
+			return c.JSON(http.StatusBadRequest, echo.Map{"message": err.Error()})
+		}
+		return c.JSON(http.StatusOK, echo.Map{"message": "Establishment deleted successfully"})
 	}
 }

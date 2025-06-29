@@ -35,6 +35,7 @@ func main() {
 	e := echo.New()
 	e.Use(echoMiddleware.Logger())
 	e.Use(echoMiddleware.Recover())
+	e.Use(echoMiddleware.CORS()) // Allows all origins, methods, and headers by default
 	
 	// Start database connection
 	db, err := database.Init()
